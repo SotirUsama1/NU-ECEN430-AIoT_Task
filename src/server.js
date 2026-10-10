@@ -1,8 +1,38 @@
 const express = require("express");
 const http = require("http");
 const WebSocket = require("ws");
+const fs = require("fs");
 const path = require("path");
 const pty = require("node-pty");
+
+function loadDashboardRuntimeConfig() {
+  const configPath = path.join(__dirname, "..", "dashboard.env");
+  let contents;
+  try {
+    contents = fs.readFileSync(configPath, "utf8");
+  } catch (error) {
+    if (error.code === "ENOENT") return;
+    throw error;
+  }
+
+  const runtimeKeys = new Set([
+    "AWS_REGION",
+    "AWS_PROFILE",
+    "EC2_INSTANCE_ID",
+    "EC2_SERIAL_PORT",
+    "BROWSER_SSH_TARGET",
+    "BROWSER_SSH_KEY_PATH",
+  ]);
+  for (const line of contents.split(/\r?\n/)) {
+    const separator = line.indexOf("=");
+    if (separator < 1) continue;
+    const key = line.slice(0, separator).trim();
+    if (runtimeKeys.has(key)) process.env[key] = line.slice(separator + 1).trim();
+  }
+}
+
+loadDashboardRuntimeConfig();
+
 const {
   EC2Client,
   DescribeInstancesCommand,
@@ -22,8 +52,10 @@ const {
 } = require("./serial-console");
 
 const PORT = 3001;
+const HOST = process.env.DASHBOARD_HOST?.trim() || "127.0.0.1";
 const { region: REGION, instanceId: INSTANCE_ID, serialPort: SERIAL_PORT } = SERIAL_CONSOLE_CONFIG;
 const BROWSER_SSH_TARGET = process.env.BROWSER_SSH_TARGET?.trim();
+const BROWSER_SSH_KEY_PATH = process.env.BROWSER_SSH_KEY_PATH?.trim();
 const MAX_SSH_INPUT_LENGTH = 512 * 1024;
 const MAX_SERIAL_INPUT_LENGTH = 4096;
 const DASHBOARD_REFRESH_MS = 30_000;
@@ -324,15 +356,27 @@ function startBrowserSsh(socket, cols = 80, rows = 24) {
 
   let ssh;
   try {
-    ssh = pty.spawn("ssh", [
+    const sshArgs = [
       "-tt",
       "-o", "BatchMode=yes",
       "-o", "ConnectTimeout=15",
       "-o", "ClearAllForwardings=yes",
-      "-o", "StrictHostKeyChecking=yes",
-      "--",
-      BROWSER_SSH_TARGET,
-    ], {
+      "-o", "StrictHostKeyChecking=accept-new",
+      "-o", "CheckHostIP=no",
+      "-o", "UserKnownHostsFile=/run/dashboard-ssh/known_hosts",
+      "-o", `HostKeyAlias=ec2-dashboard-${REGION}-${INSTANCE_ID}`,
+    ];
+    if (BROWSER_SSH_KEY_PATH) {
+      const identityFile = BROWSER_SSH_KEY_PATH === "~"
+        ? process.env.HOME
+        : BROWSER_SSH_KEY_PATH.startsWith("~/")
+          ? path.join(process.env.HOME || "", BROWSER_SSH_KEY_PATH.slice(2))
+          : path.resolve(BROWSER_SSH_KEY_PATH);
+      sshArgs.push("-i", identityFile, "-o", "IdentitiesOnly=yes");
+    }
+    sshArgs.push("--", BROWSER_SSH_TARGET);
+
+    ssh = pty.spawn("ssh", sshArgs, {
       name: "xterm-256color",
       cols: Math.max(20, Math.min(300, Number(cols) || 80)),
       rows: Math.max(5, Math.min(120, Number(rows) || 24)),
@@ -567,9 +611,9 @@ wss.on("connection", (socket, request) => {
   refreshDashboard();
 });
 
-server.listen(PORT, "127.0.0.1", () => {
+server.listen(PORT, HOST, () => {
   console.log(
-    `Dashboard running at http://localhost:${PORT}`
+    `Dashboard running at http://localhost:${PORT} (bound to ${HOST})`
   );
 });
 

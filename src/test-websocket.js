@@ -1,6 +1,7 @@
 const { spawn } = require("child_process");
 const http = require("http");
 const WebSocket = require("ws");
+const { SERIAL_CONSOLE_CONFIG } = require("./serial-console");
 
 const PORT = 3001;
 
@@ -71,7 +72,7 @@ const ssh = spawn(
   [
     "-i",
     "/tmp/aws-serial-test/key",
-    "i-07cd9a05a4fb8d592.port0@serial-console.ec2-instance-connect.eu-west-3.aws",
+    `${SERIAL_CONSOLE_CONFIG.instanceId}.port${SERIAL_CONSOLE_CONFIG.serialPort}@${SERIAL_CONSOLE_CONFIG.endpoint}`,
   ],
   {
     stdio: ["inherit", "pipe", "pipe"],

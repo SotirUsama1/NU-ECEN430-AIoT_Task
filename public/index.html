@@ -102,10 +102,10 @@
     .clear-button { border: 1px solid var(--line); background: white; border-radius: 6px; padding: 5px 9px; color: #52647d; cursor: pointer; font-size: 11px; }
     .boot-card-content { padding: 16px; }
     .boot-caption { color: var(--muted); font-size: 11px; margin-bottom: 16px; }
-    .boot-timeline { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); position: relative; gap: 3px; margin-bottom: 19px; }
-    .boot-timeline::before { content: ""; position: absolute; height: 3px; left: 8%; right: 8%; top: 15px; background: #e4eaf2; }
-    .boot-timeline-progress { position: absolute; height: 3px; left: 8%; top: 15px; width: var(--progress, 0%); max-width: 84%; background: #2c9aee; transition: width .25s; }
-    .boot-step { position: relative; flex-direction: column; text-align: center; gap: 7px; z-index: 1; min-width: 0; }
+    .boot-timeline { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); position: relative; gap: 0; margin-bottom: 19px; }
+    .boot-timeline::before { content: ""; position: absolute; height: 3px; left: 8.333333%; right: 8.333333%; top: 15px; background: #e4eaf2; }
+    .boot-timeline-progress { position: absolute; height: 3px; left: 8.333333%; top: 15px; width: var(--progress, 0%); background: #2c9aee; transition: width .25s; }
+    .boot-step { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 7px; z-index: 1; min-width: 0; }
     .boot-node { width: 30px; height: 30px; display: grid; place-items: center; border: 2px solid #cbd5e1; border-radius: 50%; background: white; color: #9aa8ba; font-size: 11px; }
     .boot-step.observed .boot-node { background: #e8f8f1; border-color: #25b77b; color: #07834e; font-weight: 800; }
     .boot-step.latest .boot-node { background: #eaf3ff; border: 3px solid #1780f4; color: #075dbd; box-shadow: 0 0 0 4px #1675e81c; }
@@ -233,17 +233,17 @@
       <button class="nav-item" type="button" data-nav="ssh"><span class="nav-icon">›_</span>SSH Terminal</button>
       <button class="nav-item" type="button" data-nav="settings"><span class="nav-icon">⚙</span>Settings</button>
       <div class="sidebar-spacer"></div>
-      <div class="side-instance"><div class="side-instance-label">Connected instance</div><div id="sidebar-instance-id" class="side-instance-id">i-07cd9a05a4fb8d592</div></div>
+      <div class="side-instance"><div class="side-instance-label">Connected instance</div><div id="sidebar-instance-id" class="side-instance-id">Loading…</div></div>
     </aside>
 
     <main id="overview">
       <section class="page-heading">
         <div>
           <div class="instance-title-line">
-            <h1 id="instance-title" class="instance-title">i-07cd9a05a4fb8d592</h1>
+            <h1 id="instance-title" class="instance-title">Loading instance…</h1>
             <span id="instance-state" class="state-badge warn">Loading</span>
           </div>
-          <p class="subtitle"><span>EC2 Instance</span><span class="sep">•</span><span id="heading-region">eu-west-3 (Paris)</span><span class="sep">•</span><span id="heading-port">Serial Port 0</span></p>
+          <p class="subtitle"><span>EC2 Instance</span><span class="sep">•</span><span id="heading-region">Loading region…</span><span class="sep">•</span><span id="heading-port">Serial Port 0</span></p>
           <p id="data-warning" class="data-warning" role="status" hidden></p>
         </div>
         <div class="page-actions">
@@ -279,11 +279,17 @@
           <section id="boot-card" class="card">
             <div class="card-title"><div class="card-title-left"><span class="card-icon">♧</span><span>Boot Sequence</span></div><div class="card-tools stopwatch-tools"><span id="boot-phase-badge" class="state-badge warn boot-phase-badge">Waiting</span><span class="stopwatch-label">Stopwatch</span><span id="boot-stopwatch" class="stopwatch-value" title="Elapsed since the first observed boot output">00:00.00</span></div></div>
             <div class="boot-card-content">
-              <div id="boot-caption" class="boot-caption">After reboot confirmation, the timeline stays at zero during shutdown and starts when fresh boot output arrives. It stops at Login Prompt. † Bootloader marks the first visible Linux handoff when firmware or GRUB output is hidden.</div>
+              <div id="boot-caption" class="boot-caption">The timeline stays at zero during shutdown and starts with fresh boot output. Times use serial arrival at this dashboard, so milestones delivered in one network packet can share a timestamp. Bootloader is inferred when firmware or GRUB output is hidden; the stopwatch stops at an actual tty login prompt.</div>
               <div id="boot-timeline" class="boot-timeline">
                 <div id="boot-progress" class="boot-timeline-progress"></div>
+                <div class="boot-step" data-stage="bootloader"><span class="boot-node">○</span><span class="boot-step-name">Bootloader</span><span class="boot-step-state">Not observed</span></div>
+                <div class="boot-step" data-stage="kernel"><span class="boot-node">○</span><span class="boot-step-name">Kernel</span><span class="boot-step-state">Not observed</span></div>
+                <div class="boot-step" data-stage="initramfs"><span class="boot-node">○</span><span class="boot-step-name">Initramfs</span><span class="boot-step-state">Not observed</span></div>
+                <div class="boot-step" data-stage="init"><span class="boot-node">○</span><span class="boot-step-name">sbin/init</span><span class="boot-step-state">Not observed</span></div>
+                <div class="boot-step" data-stage="services"><span class="boot-node">○</span><span class="boot-step-name">System Services</span><span class="boot-step-state">Not observed</span></div>
+                <div class="boot-step" data-stage="login"><span class="boot-node">○</span><span class="boot-step-name">Login Prompt</span><span class="boot-step-state">Not observed</span></div>
               </div>
-              <div class="boot-progress-info"><span id="boot-count">0 of 6 milestones observed</span><span id="boot-progress-label">Observed milestones</span></div>
+              <div class="boot-progress-info"><span id="boot-count">0 of 6 milestones observed</span><span id="boot-progress-label">Waiting for boot output</span></div>
               <div class="progress-track"><div id="boot-progress-bar" class="progress-value"></div></div>
               <div class="recent-events" style="margin-top:17px">
                 <div class="recent-title">Recent Boot Events</div>
@@ -375,9 +381,10 @@
     let lastSerialAt = 0;
     let pendingBootLine = "";
     let bootStartedAt = null;
+    let bootStoppedAt = null;
     let lastMilestoneAt = null;
     let bootStopwatchTimer = null;
-    let awaitingBootStart = false;
+    let awaitingBootStart = true;
     let bootPhase = "monitoring";
     let completedLogLines = 0;
     let currentLogLineHasText = false;
@@ -385,14 +392,15 @@
     const recentEvents = [];
 
     const stages = [
-      { key: "bootloader", name: "Bootloader", pattern: /GNU GRUB|GRUB version|Booting from|Booting .*bootloader|Loading Linux(?: kernel)?|EFI stub:\s*Booting Linux|Booting Linux on physical CPU/i },
+      { key: "bootloader", name: "Bootloader" },
       { key: "kernel", name: "Kernel", pattern: /Linux version |Kernel command line/i },
-      { key: "initramfs", name: "Initramfs", pattern: /initramfs|initrd|unpacking initramfs|mounting root filesystem/i },
+      { key: "initramfs", name: "Initramfs", pattern: /unpacking initramfs|freeing initrd memory|initramfs.*(?:unpack|mount)|mounting root filesystem|mounting rootfs/i },
       { key: "init", name: "sbin\/init", pattern: /systemd\[1\]|systemd .*running in system mode|switching root/i },
-      { key: "services", name: "System Services", pattern: /Reached target .*?(multi-user|graphical|default)|Started .*\.service/i },
-      { key: "login", name: "Login Prompt", pattern: /serial-getty@ttyS0.*Started|ttyS0 login:|\blogin:\s*$/i },
+      { key: "services", name: "System Services", pattern: /Reached target .*?(multi-user|graphical|default|login prompts)|Started .*\.service/i },
+      { key: "login", name: "Login Prompt", pattern: /^(?:[A-Za-z0-9_.-]+\s+)?login:\s*$/i },
     ];
     const bootStartPattern = /GNU GRUB|GRUB version|Booting from|Booting .*bootloader|Loading Linux(?: kernel)?|EFI stub:\s*Booting Linux|Booting Linux on physical CPU|Linux version |Kernel command line/i;
+    const explicitBootloaderPattern = /GNU GRUB|GRUB version|Booting from|Booting .*bootloader|Loading Linux(?: kernel)?|EFI stub:\s*Booting Linux/i;
 
     function sendSocketMessage(message) {
       if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message));
@@ -553,13 +561,15 @@
     }
 
     function renderStopwatch() {
-      $("boot-stopwatch").textContent = bootStartedAt === null ? "00:00.00" : formatDuration(performance.now() - bootStartedAt);
+      const endTime = bootStoppedAt ?? performance.now();
+      $("boot-stopwatch").textContent = bootStartedAt === null ? "00:00.00" : formatDuration(endTime - bootStartedAt);
     }
 
-    function startBootStopwatch() {
+    function startBootStopwatch(startedAt) {
       if (bootStartedAt !== null) return;
       bootPhase = "booting";
-      bootStartedAt = performance.now();
+      bootStartedAt = startedAt;
+      bootStoppedAt = null;
       lastMilestoneAt = bootStartedAt;
       renderStopwatch();
       bootStopwatchTimer = setInterval(renderStopwatch, 100);
@@ -569,6 +579,7 @@
       if (bootStopwatchTimer !== null) clearInterval(bootStopwatchTimer);
       bootStopwatchTimer = null;
       bootStartedAt = null;
+      bootStoppedAt = null;
       lastMilestoneAt = null;
       awaitingBootStart = waitForBootStart;
       bootPhase = phase;
@@ -594,11 +605,9 @@
     }
 
     function renderBootSequence() {
-      const observed = [...observedStages.keys()];
-      const count = observed.length;
-      const latest = observedStages.size ? [...observedStages.keys()].at(-1) : null;
+      const count = observedStages.size;
+      const latestIndex = stages.reduce((furthest, stage, index) => observedStages.has(stage.key) ? Math.max(furthest, index) : furthest, -1);
       const progressActive = bootPhase === "booting" || bootPhase === "complete";
-      $("boot-timeline").querySelectorAll(".boot-step").forEach((element) => element.remove());
       const track = $("boot-progress");
       const phaseBadge = $("boot-phase-badge");
       const phaseLabels = {
@@ -610,27 +619,31 @@
       const [phaseLabel, phaseKind] = phaseLabels[bootPhase] || phaseLabels.monitoring;
       setBadge(phaseBadge, phaseLabel, phaseKind);
       phaseBadge.classList.add("boot-phase-badge");
-      for (const stage of stages) {
-        const item = document.createElement("div");
+      for (const [index, stage] of stages.entries()) {
+        const item = $("boot-timeline").querySelector(`[data-stage="${stage.key}"]`);
+        if (!item) continue;
         const done = observedStages.has(stage.key);
         const timing = observedStages.get(stage.key);
-        item.className = `boot-step${done ? " observed" : ""}${stage.key === latest ? " latest" : ""}${timing?.inferred ? " inferred" : ""}`;
-        item.innerHTML = `<span class="boot-node">${done ? "✓" : "○"}</span><span class="boot-step-name"></span><span class="boot-step-state"></span>`;
-        item.querySelector(".boot-step-name").textContent = stage.name;
+        item.classList.toggle("observed", done);
+        item.classList.toggle("latest", progressActive && index === latestIndex);
+        item.classList.toggle("inferred", Boolean(timing?.inferred));
+        item.querySelector(".boot-node").textContent = done ? "✓" : "○";
         const timingLabel = item.querySelector(".boot-step-state");
         timingLabel.textContent = timing ? `+${formatDuration(timing.durationMs)}${timing.inferred ? "†" : ""}` : "Not observed";
+        timingLabel.title = "";
         if (timing) timingLabel.title = timing.inferred
           ? "Inferred at the first visible Linux handoff because firmware/GRUB output was not present in the serial stream."
           : `Lap ${formatDuration(timing.durationMs)} · elapsed ${formatDuration(timing.elapsedMs)} since stopwatch start`;
-        $("boot-timeline").appendChild(item);
       }
-      track.style.setProperty("--progress", `${!progressActive || count <= 1 ? 0 : ((count - 1) / (stages.length - 1)) * 84}%`);
+      const timelinePosition = latestIndex < 0 ? 0 : (latestIndex / stages.length) * 100;
+      const sequenceProgress = latestIndex < 0 ? 0 : ((latestIndex + 1) / stages.length) * 100;
+      track.style.setProperty("--progress", `${progressActive ? timelinePosition : 0}%`);
       $("boot-count").textContent = `${count} of ${stages.length} milestones observed`;
       $("boot-progress-label").textContent = bootPhase === "shutdown"
         ? "Shutdown · waiting for boot output"
         : bootPhase === "complete" ? "Login prompt reached"
-          : bootPhase === "booting" ? "Boot phase" : "Waiting for boot output";
-      $("boot-progress-bar").style.width = `${progressActive ? (count / stages.length) * 100 : 0}%`;
+          : bootPhase === "booting" ? `Sequence through ${stages[latestIndex]?.name || "boot output"}` : "Waiting for boot output";
+      $("boot-progress-bar").style.width = `${progressActive ? sequenceProgress : 0}%`;
     }
 
     function renderRecentEvents() {
@@ -894,7 +907,55 @@
       navItems.forEach((item) => item.classList.toggle("active", item.dataset.nav === active));
     }
 
+    function recordBootStage(stage, observedAt, inferred = false) {
+      if (bootStartedAt === null || observedStages.has(stage.key)) return;
+      observedStages.set(stage.key, {
+        elapsedMs: Math.max(0, observedAt - bootStartedAt),
+        durationMs: Math.max(0, observedAt - (lastMilestoneAt ?? bootStartedAt)),
+        inferred,
+      });
+      lastMilestoneAt = observedAt;
+      if (stage.key === "login") {
+        bootPhase = "complete";
+        bootStoppedAt = observedAt;
+        if (bootStopwatchTimer !== null) clearInterval(bootStopwatchTimer);
+        bootStopwatchTimer = null;
+        renderStopwatch();
+      }
+    }
+
+    function observeBootLine(line, receivedAt, partial = false) {
+      if (!line || bootPhase === "complete") return;
+
+      if (partial) {
+        if (bootStartedAt === null || awaitingBootStart) return;
+        const loginStage = stages.find((stage) => stage.key === "login");
+        if (loginStage.pattern.test(line)) recordBootStage(loginStage, receivedAt);
+        return;
+      }
+
+      const startsBoot = bootStartPattern.test(line);
+      if (awaitingBootStart) {
+        if (!startsBoot) return;
+        awaitingBootStart = false;
+        startBootStopwatch(receivedAt);
+      }
+      if (bootStartedAt === null) return;
+
+      if (startsBoot && !observedStages.has("bootloader")) {
+        const bootloaderStage = stages.find((stage) => stage.key === "bootloader");
+        recordBootStage(bootloaderStage, receivedAt, !explicitBootloaderPattern.test(line));
+      }
+
+      for (const stage of stages) {
+        if (stage.key === "bootloader" || observedStages.has(stage.key)) continue;
+        if (stage.pattern.test(line)) recordBootStage(stage, receivedAt);
+        if (bootPhase === "complete") break;
+      }
+    }
+
     function processIncomingSerial(raw) {
+      const receivedAt = performance.now();
       const runs = serialFormatter(raw);
       appendSerialRuns(runs);
       const plain = runs.map((run) => run.text).join("");
@@ -907,52 +968,15 @@
       pendingBootLine += plain;
       const lines = pendingBootLine.split("\n");
       pendingBootLine = lines.pop() || "";
-      const scanLines = [...lines, pendingBootLine];
-      for (let index = 0; index < scanLines.length; index++) {
-        const line = scanLines[index];
-        if (awaitingBootStart) {
-          if (!bootStartPattern.test(line)) continue;
-          awaitingBootStart = false;
-          startBootStopwatch();
-        } else if (bootStartedAt === null) {
-          startBootStopwatch();
-        }
-
-        if (bootStartPattern.test(line) && !observedStages.has("bootloader")) {
-          const observedAt = performance.now();
-          const explicitBootloaderOutput = /GNU GRUB|GRUB version|Booting from|Booting .*bootloader|Loading Linux(?: kernel)?|EFI stub:\s*Booting Linux/i.test(line);
-          observedStages.set("bootloader", {
-            elapsedMs: observedAt - bootStartedAt,
-            durationMs: observedAt - (lastMilestoneAt ?? bootStartedAt),
-            inferred: !explicitBootloaderOutput,
-          });
-          lastMilestoneAt = observedAt;
-        }
-
-        for (const stage of stages) {
-          if (!observedStages.has(stage.key) && stage.pattern.test(line)) {
-            const observedAt = performance.now();
-            observedStages.set(stage.key, {
-              elapsedMs: observedAt - bootStartedAt,
-              durationMs: observedAt - (lastMilestoneAt ?? bootStartedAt),
-            });
-            lastMilestoneAt = observedAt;
-            if (stage.key === "login") {
-              bootPhase = "complete";
-              if (bootStopwatchTimer !== null) {
-                renderStopwatch();
-                clearInterval(bootStopwatchTimer);
-                bootStopwatchTimer = null;
-              }
-            }
-          }
-        }
-
-        if (index < lines.length) {
-          const clean = line.trim();
-          if (clean) recentEvents.unshift({ time: new Date().toLocaleTimeString([], { hour12: false }), text: clean.slice(0, 320) });
-        }
+      for (const line of lines) {
+        observeBootLine(line, receivedAt);
+        const clean = line.trim();
+        if (clean) recentEvents.unshift({ time: new Date().toLocaleTimeString([], { hour12: false }), text: clean.slice(0, 320) });
       }
+      // A serial login prompt commonly has no trailing newline. Only test this
+      // unfinished fragment for that exact prompt; other milestones wait for a
+      // complete line so a growing fragment cannot trigger twice or out of order.
+      observeBootLine(pendingBootLine, receivedAt, true);
       renderBootSequence();
       recentEvents.splice(6);
       renderRecentEvents();
@@ -990,7 +1014,6 @@
         $("reboot-confirm").disabled = message.success;
         if (message.success) setTimeout(() => refreshDashboard(), 5000);
         else if (awaitingBootStart) {
-          awaitingBootStart = false;
           bootPhase = "monitoring";
           pendingBootLine = "";
           renderBootSequence();

@@ -9,12 +9,21 @@ const os = require("os");
 const path = require("path");
 const crypto = require("crypto");
 
-const REGION = "eu-west-3";
-const INSTANCE_ID = "i-07cd9a05a4fb8d592";
-const SERIAL_PORT = 0;
+const REGION = process.env.AWS_REGION?.trim() || process.env.AWS_DEFAULT_REGION?.trim();
+const INSTANCE_ID = process.env.EC2_INSTANCE_ID?.trim();
+const SERIAL_PORT = Number(process.env.EC2_SERIAL_PORT ?? 0);
 
-const SERIAL_ENDPOINT =
-  "serial-console.ec2-instance-connect.eu-west-3.aws";
+if (!REGION) {
+  throw new Error("AWS_REGION must be set (for example, from Terraform's dashboard_env output).");
+}
+if (!INSTANCE_ID || !/^i-[a-f0-9]+$/i.test(INSTANCE_ID)) {
+  throw new Error("EC2_INSTANCE_ID must be set to the Terraform-managed EC2 instance ID.");
+}
+if (!Number.isInteger(SERIAL_PORT) || SERIAL_PORT !== 0) {
+  throw new Error("EC2_SERIAL_PORT must be 0; AWS currently supports serial port 0.");
+}
+
+const SERIAL_ENDPOINT = `serial-console.ec2-instance-connect.${REGION}.aws`;
 const CONNECT_TIMEOUT_SECONDS = 15;
 const SERIAL_CONSOLE_CONFIG = Object.freeze({
   region: REGION,
