@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 440" role="img" aria-labelledby="title desc">
+  <title id="title">Browser SSH terminal connection sequence</title>
+  <desc id="desc">The browser requests an SSH terminal. The dashboard starts an SSH PTY using the mounted EC2 key and connects directly to the instance public IP over port 22. Shell output and input are relayed over WebSocket.</desc>
+  <defs>
+    <marker id="blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#1675e8"/></marker>
+    <marker id="green" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#0b9f66"/></marker>
+    <marker id="violet" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#805ad5"/></marker>
+    <marker id="amber" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#d79a2f"/></marker>
+  </defs>
+  <rect x="12" y="12" width="1076" height="415" rx="18" fill="#fbfdff" stroke="#e3eaf3"/>
+  <g font-family="Inter,Arial,sans-serif" text-anchor="middle">
+    <rect x="110" y="33" width="194" height="59" rx="13" fill="#eaf3ff" stroke="#cfe2f8"/><text x="207" y="58" fill="#075dbd" font-size="16" font-weight="750">Browser terminal</text><text x="207" y="77" fill="#5e7fa6" font-size="12">xterm.js</text>
+    <rect x="452" y="33" width="206" height="59" rx="13" fill="#f0ebff" stroke="#d8ccfa"/><text x="555" y="58" fill="#57369f" font-size="16" font-weight="750">Dashboard container</text><text x="555" y="77" fill="#76629d" font-size="12">node-pty + OpenSSH</text>
+    <rect x="796" y="33" width="194" height="59" rx="13" fill="#fff4e2" stroke="#f0dfba"/><text x="893" y="58" fill="#8c6115" font-size="16" font-weight="750">Ubuntu instance</text><text x="893" y="77" fill="#9b7b40" font-size="12">public IP · TCP 22</text>
+  </g>
+  <g stroke="#cbd7e5" stroke-width="1.5" stroke-dasharray="5 7"><path d="M207 101v283M555 101v283M893 101v283"/></g>
+  <g font-family="Inter,Arial,sans-serif" font-size="14" font-weight="650">
+    <path d="M207 143h348" fill="none" stroke="#1675e8" stroke-width="2.7" marker-end="url(#blue)"/><rect x="278" y="123" width="204" height="29" rx="14" fill="#fff" stroke="#dceafa"/><text x="380" y="143" text-anchor="middle" fill="#175da7">1 · ssh-start + terminal size</text>
+    <path d="M555 191v27h70v-27" fill="none" stroke="#805ad5" stroke-width="2.7" marker-end="url(#violet)"/><rect x="628" y="190" width="223" height="30" rx="14" fill="#fff" stroke="#e5dcfa"/><text x="739" y="210" text-anchor="middle" fill="#6244ab">2 · Spawn SSH PTY with mounted key</text>
+    <path d="M555 258h338" fill="none" stroke="#0b9f66" stroke-width="2.7" marker-end="url(#green)"/><rect x="613" y="238" width="225" height="30" rx="14" fill="#fff" stroke="#d4efdf"/><text x="725" y="258" text-anchor="middle" fill="#11734f">3 · SSH direct to public IP :22</text>
+    <path d="M893 301H555" fill="none" stroke="#d79a2f" stroke-width="2.7" marker-end="url(#amber)"/><rect x="623" y="281" width="215" height="30" rx="14" fill="#fff" stroke="#f0dfba"/><text x="730" y="301" text-anchor="middle" fill="#8c6115">4 · Authenticated shell output</text>
+    <path d="M555 341H207" fill="none" stroke="#1675e8" stroke-width="2.7" marker-end="url(#blue)"/><rect x="278" y="321" width="204" height="30" rx="14" fill="#fff" stroke="#dceafa"/><text x="380" y="341" text-anchor="middle" fill="#175da7">5 · WebSocket terminal output</text>
+    <path d="M207 375h348" fill="none" stroke="#805ad5" stroke-width="2.2" stroke-dasharray="6 5" marker-end="url(#violet)"/><text x="380" y="369" text-anchor="middle" fill="#6244ab">6 · Keystrokes + resize events</text>
+  </g>
+  <rect x="170" y="393" width="760" height="25" rx="12.5" fill="#fff7e8" stroke="#f2e1bc"/>
+  <text x="550" y="410" text-anchor="middle" fill="#85631f" font-family="Inter,Arial,sans-serif" font-size="12" font-weight="650">This path needs a reachable IP, inbound TCP 22, sshd, and the matching EC2 private key.</text>
+</svg>

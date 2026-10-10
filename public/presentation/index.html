@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f7fb">
+  <meta name="description" content="A visual walkthrough of the EC2 Serial Console Dashboard project.">
+  <title>Boot Before Network — EC2 Serial Console Dashboard</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <div class="presentation-shell">
+    <header class="topbar">
+      <a class="brand" href="#slide-1" aria-label="Presentation home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40" fill="none"><path d="M11 29.5h18.4a6 6 0 0 0 .4-12 9.8 9.8 0 0 0-18.6-2.1A7.1 7.1 0 0 0 11 29.5Z" fill="currentColor" opacity=".22"/><path d="M11 29.5h18.4a6 6 0 0 0 .4-12 9.8 9.8 0 0 0-18.6-2.1A7.1 7.1 0 0 0 11 29.5Z" stroke="currentColor" stroke-width="2.4"/><path d="M14 22h12m-6-6v12m-4-4 4 4 4-4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="brand-copy"><strong>EC2 Serial Console</strong><small>PROJECT PRESENTATION</small></span>
+      </a>
+      <div class="top-status"><span class="status-dot"></span><span>Architecture walkthrough</span></div>
+    </header>
+
+    <main class="stage" id="stage" aria-label="Presentation slides">
+      <article class="slide hero-slide active" id="slide-1" data-title="The problem" aria-hidden="false">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-mark">01</span> THE PROBLEM</p>
+          <h1>A machine can be<br><span class="accent-text">booting but unreachable.</span></h1>
+          <p class="presenter-line">Presented by <strong>Sotir Usama Latif</strong></p>
+          <p class="hero-lede">When a remote Ubuntu system is still bringing up its network—or has no usable IP address or SSH service—there is no normal path in to see what is happening.</p>
+          <div class="problem-callout"><span class="callout-icon" aria-hidden="true">!</span><p><strong>That is the blind spot.</strong> The system may be progressing, waiting, or failing, while the operator sees only a timeout.</p></div>
+          <p class="hero-footnote">This project explores an independent view of boot output through the EC2 Serial Console.</p>
+        </div>
+        <div class="hero-visual" aria-label="Illustration of a remote machine whose network path is offline while its serial output remains available">
+          <svg class="hero-svg" viewBox="0 0 620 480" role="img" aria-labelledby="hero-svg-title hero-svg-desc">
+            <title id="hero-svg-title">A remote Ubuntu machine is booting without network access</title>
+            <desc id="hero-svg-desc">A server emits serial boot text to a console while a broken network path blocks SSH.</desc>
+            <defs>
+              <linearGradient id="hero-bg" x1="62" y1="48" x2="555" y2="420" gradientUnits="userSpaceOnUse"><stop stop-color="#eff6ff"/><stop offset="1" stop-color="#f7fbff"/></linearGradient>
+              <linearGradient id="hero-blue" x1="224" y1="113" x2="432" y2="378" gradientUnits="userSpaceOnUse"><stop stop-color="#2389ee"/><stop offset="1" stop-color="#1265c5"/></linearGradient>
+              <filter id="hero-shadow" x="100" y="66" width="413" height="383" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#174477" flood-opacity=".14"/></filter>
+            </defs>
+            <rect x="18" y="18" width="584" height="444" rx="28" fill="url(#hero-bg)"/>
+            <circle cx="510" cy="100" r="47" fill="#dcecff"/><circle cx="90" cy="355" r="32" fill="#e2f8ef"/>
+            <g filter="url(#hero-shadow)">
+              <rect x="207" y="82" width="232" height="296" rx="20" fill="white" stroke="#dbe5f0" stroke-width="2"/>
+              <rect x="225" y="101" width="196" height="82" rx="12" fill="#f7faff" stroke="#e3ebf4"/>
+              <rect x="225" y="194" width="196" height="82" rx="12" fill="#f7faff" stroke="#e3ebf4"/>
+              <rect x="225" y="287" width="196" height="72" rx="12" fill="#f7faff" stroke="#e3ebf4"/>
+              <g fill="#cbd8e8"><circle cx="248" cy="128" r="4"/><circle cx="263" cy="128" r="4"/><circle cx="278" cy="128" r="4"/><circle cx="248" cy="221" r="4"/><circle cx="263" cy="221" r="4"/><circle cx="278" cy="221" r="4"/><circle cx="248" cy="311" r="4"/><circle cx="263" cy="311" r="4"/></g>
+              <g stroke="#91a7c2" stroke-width="3" stroke-linecap="round"><path d="M248 151h88M248 244h111M248 334h70"/><path d="M248 162h133M248 255h86M248 345h105" stroke="#d2ddea" stroke-width="2"/></g>
+              <circle cx="391" cy="128" r="5" fill="#f2b747"/><circle cx="391" cy="221" r="5" fill="#12b981"/><circle cx="391" cy="311" r="5" fill="#12b981"/>
+            </g>
+            <path d="M438 146h44c20 0 24 14 24 27v26" fill="none" stroke="#e0a32a" stroke-width="4" stroke-linecap="round" stroke-dasharray="7 8"/>
+            <path d="M505 205v32" stroke="#e0a32a" stroke-width="4" stroke-linecap="round"/>
+            <rect x="454" y="238" width="111" height="77" rx="12" fill="#fff" stroke="#f1d79c" stroke-width="2"/>
+            <text x="468" y="263" fill="#9a6a13" font-size="11" font-family="ui-monospace,monospace">serial output</text>
+            <path d="M469 280h60m-60 10h45" stroke="#e0a32a" stroke-width="2.4" stroke-linecap="round"/>
+            <g transform="translate(72 93)">
+              <path d="M2 29h39a14 14 0 0 0 .5-28 23 23 0 0 0-43 7 12 12 0 0 0 3.5 21Z" fill="#fff" stroke="#c7d6e8" stroke-width="2"/>
+              <path d="M14 14h17M14 21h10" stroke="#91a7c2" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="m41 10 12 12m0-12L41 22" stroke="#d54c5b" stroke-width="3" stroke-linecap="round"/>
+              <rect x="-2" y="43" width="75" height="24" rx="12" fill="#fff0f1"/><text x="9" y="59" fill="#aa3341" font-size="10" font-family="Inter,Arial,sans-serif" font-weight="700">SSH unavailable</text>
+            </g>
+            <rect x="80" y="360" width="136" height="41" rx="12" fill="#fff" stroke="#dbe5f0"/>
+            <circle cx="100" cy="380" r="5" fill="#e6ad3f"/><text x="113" y="384" fill="#52647d" font-size="11" font-family="Inter,Arial,sans-serif">network still starting</text>
+            <rect x="362" y="399" width="198" height="35" rx="17.5" fill="#e8f8f1"/><circle cx="382" cy="416" r="4" fill="#0b9f66"/><text x="394" y="420" fill="#11734f" font-size="11" font-family="Inter,Arial,sans-serif" font-weight="650">Boot output still exists</text>
+          </svg>
+          <div class="visual-caption"><span class="caption-dot"></span> The guest can emit serial output before SSH is available.</div>
+        </div>
+      </article>
+
+      <article class="slide" id="slide-2" data-title="The access gap" aria-hidden="true">
+        <div class="slide-head"><p class="eyebrow"><span class="eyebrow-mark">02</span> WHY IT MATTERS</p><h2>The hardest time to debug is often <span class="accent-text">before the network is ready.</span></h2><p class="slide-intro">A remote login depends on several guest services being alive. A serial console gives a separate view into the boot process.</p></div>
+        <div class="two-column gap-layout">
+          <div class="boot-roadmap">
+            <div class="roadmap-title"><span class="tiny-icon blue-icon">↻</span><div><strong>One machine, two access windows</strong><small>Boot progresses in stages</small></div></div>
+            <div class="timeline-track"><div class="timeline-line"></div><div class="timeline-window network-window"></div><div class="timeline-window serial-window"></div>
+              <div class="timeline-step"><i class="timeline-node"></i><b>Firmware</b><small>Power-on</small></div>
+              <div class="timeline-step"><i class="timeline-node"></i><b>Kernel</b><small>Drivers load</small></div>
+              <div class="timeline-step"><i class="timeline-node"></i><b>Initramfs</b><small>Early userspace</small></div>
+              <div class="timeline-step"><i class="timeline-node"></i><b>Network</b><small>Interface + IP</small></div>
+              <div class="timeline-step"><i class="timeline-node"></i><b>SSH</b><small>Remote login</small></div>
+            </div>
+            <div class="timeline-legend"><span><i class="legend-square serial-color"></i>Serial console can expose boot output</span><span><i class="legend-square ssh-color"></i>SSH begins after guest networking</span></div>
+          </div>
+          <div class="gap-points">
+            <div class="gap-point"><span class="gap-number">01</span><div><strong>No usable route yet</strong><p>No guest IPv4 address or route means the operator cannot address the machine through normal SSH.</p></div><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M10 22h24M22 10v24M13 13l18 18m0-18L13 31"/></svg></div>
+            <div class="gap-point"><span class="gap-number">02</span><div><strong>The failure may be the network</strong><p>If networking itself is broken, using that same path to diagnose it becomes circular.</p></div><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M8 17a22 22 0 0 1 28 0M13 23a14 14 0 0 1 18 0M18 29a6 6 0 0 1 8 0M22 35h.1"/></svg></div>
+            <div class="gap-point"><span class="gap-number">03</span><div><strong>Silence hides the boot state</strong><p>A timeout cannot show whether Linux is waiting for a device, stuck at a prompt, or still booting.</p></div><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M7 22h7l5-11 8 22 5-11h5"/></svg></div>
+          </div>
+        </div>
+        <div class="slide-note"><span class="note-spark">✦</span> The target is an EC2 Ubuntu instance. EC2 uses virtual networking rather than Wi-Fi, but the same debugging gap appears whenever guest networking or SSH is not ready.</div>
+      </article>
+
+      <article class="slide" id="slide-3" data-title="Serial console" aria-hidden="true">
+        <div class="slide-head"><p class="eyebrow"><span class="eyebrow-mark">03</span> THE ACCESS PATH</p><h2>A serial console is a <span class="accent-text">side door to the guest.</span></h2><p class="slide-intro">It reaches the instance's serial port through AWS-managed access, instead of routing an SSH connection through the guest's IP network.</p></div>
+        <div class="serial-explainer">
+          <div class="serial-visual-card">
+            <svg viewBox="0 0 720 330" role="img" aria-label="Linux guest serial port connected through AWS managed console service to an operator">
+              <defs><linearGradient id="console-cloud" x1="411" y1="65" x2="586" y2="260"><stop stop-color="#eaf3ff"/><stop offset="1" stop-color="#f8fbff"/></linearGradient><marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#1675e8"/></marker><marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#0b9f66"/></marker></defs>
+              <rect x="18" y="18" width="684" height="294" rx="22" fill="#f8fbff" stroke="#e2eaf3"/>
+              <text x="55" y="54" fill="#8493a7" font-size="11" font-family="Inter,Arial" font-weight="700" letter-spacing="1.2">GUEST INSTANCE</text>
+              <rect x="49" y="80" width="226" height="171" rx="17" fill="#fff" stroke="#d8e4f1" stroke-width="2"/>
+              <rect x="68" y="98" width="188" height="58" rx="9" fill="#f2f7fc"/><text x="84" y="123" fill="#243954" font-size="13" font-family="Inter,Arial" font-weight="700">Ubuntu Linux</text><text x="84" y="142" fill="#71839a" font-size="10" font-family="ui-monospace,monospace">kernel → init → services</text>
+              <rect x="68" y="169" width="188" height="62" rx="9" fill="#fff8e8" stroke="#f1dfb7"/><circle cx="86" cy="190" r="6" fill="#e5ab35"/><text x="101" y="194" fill="#815c1a" font-size="11" font-family="Inter,Arial" font-weight="700">Virtual serial port</text><text x="84" y="215" fill="#997531" font-size="10" font-family="ui-monospace,monospace">console output / input</text>
+              <path d="M276 202h94" stroke="#0b9f66" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow-green)"/><text x="286" y="185" fill="#0b8c5c" font-size="10" font-family="Inter,Arial" font-weight="700">guest serial channel</text>
+              <path d="M370 98c0-19 16-34 35-34 9-26 42-37 64-18 27-13 57 4 60 32 26 1 40 32 24 52-6 8-16 13-27 13H406c-20 0-36-18-36-45Z" fill="url(#console-cloud)" stroke="#bad4f1" stroke-width="2"/>
+              <text x="411" y="93" fill="#59718e" font-size="10" font-family="Inter,Arial" font-weight="700" letter-spacing="1">AWS MANAGED ACCESS</text><text x="411" y="116" fill="#183c67" font-size="14" font-family="Inter,Arial" font-weight="700">EC2 Serial Console</text><text x="411" y="137" fill="#71839a" font-size="10" font-family="Inter,Arial">region + IAM + temporary key</text>
+              <path d="M518 154v49" stroke="#1675e8" stroke-width="3" stroke-dasharray="5 6" marker-end="url(#arrow-blue)"/>
+              <rect x="428" y="211" width="132" height="55" rx="11" fill="#fff" stroke="#d6e4f5"/><rect x="444" y="224" width="30" height="22" rx="4" fill="#eaf3ff"/><path d="M450 253h19m-9-7v7" stroke="#1675e8" stroke-width="2"/><text x="484" y="234" fill="#243954" font-size="10" font-family="Inter,Arial" font-weight="700">Operator</text><text x="484" y="249" fill="#71839a" font-size="9" font-family="Inter,Arial">browser dashboard</text>
+              <path d="M562 237h62" stroke="#1675e8" stroke-width="2" stroke-dasharray="4 6"/><circle cx="641" cy="237" r="13" fill="#fff0f1" stroke="#f0c5ca"/><path d="m635 231 12 12m0-12-12 12" stroke="#cb4b59" stroke-width="2"/><text x="565" y="220" fill="#ad3e4a" font-size="9" font-family="Inter,Arial">guest IP not required</text>
+              <rect x="49" y="270" width="226" height="22" rx="11" fill="#e8f8f1"/><circle cx="64" cy="281" r="3" fill="#0b9f66"/><text x="74" y="285" fill="#11734f" font-size="9" font-family="Inter,Arial" font-weight="650">Boot output can exist before networking</text>
+            </svg>
+          </div>
+          <div class="console-facts">
+            <div class="fact-card"><span class="fact-icon fact-blue">01</span><div><strong>Separate from guest networking</strong><p>The serial console is useful for boot and network troubleshooting even when the instance has no working network path.</p></div></div>
+            <div class="fact-card"><span class="fact-icon fact-green">02</span><div><strong>Access is still controlled</strong><p>Regional enablement and AWS IAM permissions are required; the console is not an unauthenticated endpoint.</p></div></div>
+            <div class="fact-card"><span class="fact-icon fact-amber">03</span><div><strong>AWS exposes the port abstraction</strong><p>We work with the instance serial port and AWS console service; the lower-level fleet implementation stays AWS-managed.</p></div></div>
+            <a class="source-link" href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/troubleshoot-using-serial-console.html" target="_blank" rel="noreferrer">AWS documentation: troubleshoot with EC2 Serial Console <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" id="slide-4" data-title="Project architecture" aria-hidden="true">
+        <div class="slide-head"><p class="eyebrow"><span class="eyebrow-mark">04</span> PROJECT ARCHITECTURE</p><h2>One dashboard. <span class="accent-text">Three independent connections.</span></h2><p class="slide-intro">This is the deployment and runtime topology from the project README, simplified into the paths that matter most. <a class="readme-diagram-link" href="https://github.com/SotirUsama1/NU-ECEN430-AIoT_Task#deployment-and-runtime-topology" target="_blank" rel="noreferrer">Open original README diagram ↗</a></p></div>
+        <div class="architecture-board" role="img" aria-label="Project topology: Terraform provisions EC2, browser connects to dashboard, and dashboard uses serial console, direct SSH and CloudWatch">
+          <svg class="architecture-svg" viewBox="0 0 1120 490" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <marker id="arch-blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#1675e8"/></marker>
+              <marker id="arch-green" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#0b9f66"/></marker>
+              <marker id="arch-purple" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#805ad5"/></marker>
+              <marker id="arch-orange" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#e39724"/></marker>
+            </defs>
+            <rect x="20" y="26" width="270" height="430" rx="20" fill="#f6f9fd" stroke="#dfe8f2"/>
+            <text x="45" y="59" fill="#7b8ba1" font-size="12" font-family="Inter,Arial" font-weight="800" letter-spacing="1.5">WORKSTATION</text>
+            <rect x="54" y="98" width="202" height="68" rx="14" fill="#fff" stroke="#bed7f3" stroke-width="2"/><circle cx="83" cy="132" r="17" fill="#eaf3ff"/><path d="M75 133h16m-8-8v16" stroke="#1675e8" stroke-width="2.5" stroke-linecap="round"/><text x="111" y="128" fill="#183c67" font-size="14" font-family="Inter,Arial" font-weight="750">Browser</text><text x="111" y="148" fill="#71839a" font-size="10" font-family="Inter,Arial">localhost:3001</text>
+            <rect x="54" y="220" width="202" height="94" rx="16" fill="#f0ebff" stroke="#bca8ef" stroke-width="2"/><rect x="72" y="239" width="33" height="33" rx="9" fill="#805ad5"/><path d="M80 248h17m-17 7h17m-17 7h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/><text x="117" y="253" fill="#43247e" font-size="13" font-family="Inter,Arial" font-weight="750">Dashboard</text><text x="72" y="291" fill="#68528d" font-size="10" font-family="Inter,Arial">Node.js · Express · WebSocket</text>
+            <rect x="54" y="363" width="202" height="55" rx="13" fill="#e8f8f1" stroke="#bfe9d6" stroke-width="2"/><path d="M75 384h20m-15-7 7 7-7 7" stroke="#0b9f66" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="109" y="385" fill="#11734f" font-size="12" font-family="Inter,Arial" font-weight="700">Terraform</text><text x="109" y="401" fill="#4d8c72" font-size="9" font-family="Inter,Arial">provisioning + outputs</text>
+            <rect x="803" y="26" width="294" height="430" rx="20" fill="#f8fbff" stroke="#dfe8f2"/>
+            <text x="828" y="59" fill="#7b8ba1" font-size="12" font-family="Inter,Arial" font-weight="800" letter-spacing="1.5">AWS ACCOUNT</text>
+            <rect x="855" y="100" width="190" height="94" rx="16" fill="#fff3e5" stroke="#f4d6a6" stroke-width="2"/><rect x="876" y="121" width="35" height="35" rx="9" fill="#f4b64f"/><path d="M883 130h21m-21 7h21m-21 7h21" stroke="#fff" stroke-width="2" stroke-linecap="round"/><text x="922" y="135" fill="#7e4e0b" font-size="13" font-family="Inter,Arial" font-weight="750">EC2 Ubuntu</text><text x="876" y="177" fill="#956c32" font-size="10" font-family="Inter,Arial">guest OS + virtual serial port</text>
+            <rect x="855" y="244" width="190" height="72" rx="15" fill="#e9f7ff" stroke="#b6e4f1" stroke-width="2"/><circle cx="884" cy="280" r="16" fill="#c8f1f6"/><path d="M875 280h18m-9-9v18" stroke="#0891b2" stroke-width="2"/><text x="911" y="276" fill="#15556a" font-size="12" font-family="Inter,Arial" font-weight="750">Serial Console</text><text x="911" y="294" fill="#5c8793" font-size="9" font-family="Inter,Arial">regional AWS endpoint</text>
+            <rect x="855" y="360" width="190" height="58" rx="14" fill="#e8f8f1" stroke="#bee8d4" stroke-width="2"/><circle cx="883" cy="389" r="15" fill="#c9f0dd"/><path d="M875 392c0-5 5-5 8-1 3-4 8-4 8 1" fill="none" stroke="#0b9f66" stroke-width="2"/><text x="910" y="386" fill="#126d4c" font-size="12" font-family="Inter,Arial" font-weight="750">CloudWatch</text><text x="910" y="402" fill="#5b8e77" font-size="9" font-family="Inter,Arial">instance metrics</text>
+            <rect x="362" y="66" width="390" height="366" rx="20" fill="#fff" stroke="#dce6f1" stroke-width="2" stroke-dasharray="6 7"/><text x="388" y="97" fill="#7b8ba1" font-size="11" font-family="Inter,Arial" font-weight="800" letter-spacing="1.2">CONNECTION TYPES</text>
+            <path d="M256 131h87v80h52" fill="none" stroke="#1675e8" stroke-width="3" marker-end="url(#arch-blue)"/><rect x="271" y="143" width="101" height="28" rx="14" fill="#eaf3ff"/><text x="285" y="161" fill="#1265c5" font-size="10" font-family="Inter,Arial" font-weight="700">HTTP + WebSocket</text>
+            <path d="M256 267h118v-62h22" fill="none" stroke="#e39724" stroke-width="3" marker-end="url(#arch-orange)"/><rect x="285" y="279" width="97" height="26" rx="13" fill="#fff3e5"/><text x="299" y="296" fill="#95620e" font-size="10" font-family="Inter,Arial" font-weight="700">AWS APIs · HTTPS</text>
+            <path d="M752 188h103" fill="none" stroke="#0b9f66" stroke-width="3" marker-end="url(#arch-green)"/><rect x="755" y="151" width="81" height="26" rx="13" fill="#e8f8f1"/><text x="770" y="168" fill="#11734f" font-size="10" font-family="Inter,Arial" font-weight="700">SSH · TCP 22</text>
+            <path d="M752 240h38v40h65" fill="none" stroke="#0891b2" stroke-width="3" marker-end="url(#arch-blue)"/><path d="M855 298h-43v53h-60" fill="none" stroke="#0891b2" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#arch-blue)"/><rect x="764" y="312" width="84" height="26" rx="13" fill="#e9f7ff"/><text x="779" y="329" fill="#15556a" font-size="10" font-family="Inter,Arial" font-weight="700">Serial SSH</text>
+            <path d="M752 379h103" fill="none" stroke="#805ad5" stroke-width="3" marker-end="url(#arch-purple)"/><rect x="758" y="391" width="86" height="25" rx="12.5" fill="#f0ebff"/><text x="772" y="408" fill="#6543b4" font-size="9" font-family="Inter,Arial" font-weight="700">CloudWatch API</text>
+            <path d="M256 390h87v-96h19" fill="none" stroke="#0b9f66" stroke-width="2.5" stroke-dasharray="6 6" marker-end="url(#arch-green)"/>
+            <text x="384" y="453" fill="#8594a7" font-size="10" font-family="Inter,Arial">Terraform provisions the EC2 target; outputs configure the dashboard container.</text>
+          </svg>
+          <div class="arch-legend"><span><i class="legend-line blue-line"></i>Browser UI</span><span><i class="legend-line orange-line"></i>AWS control APIs</span><span><i class="legend-line green-line"></i>Direct SSH</span><span><i class="legend-line cyan-line"></i>Serial stream</span><span><i class="legend-line purple-line"></i>Metrics</span></div>
+        </div>
+        <div class="architecture-caption"><strong>Key design choice:</strong> boot visibility does not depend on guest SSH being ready. The browser SSH terminal is a separate path for shell access after networking is available.</div>
+      </article>
+
+      <article class="slide" id="slide-5" data-title="Serial stream" aria-hidden="true">
+        <div class="slide-head"><p class="eyebrow"><span class="eyebrow-mark">05</span> SERIAL CONSOLE FLOW</p><h2>Authorize briefly. Connect securely. <span class="accent-text">Stream the console.</span></h2><p class="slide-intro">This flow mirrors the project's serial-console implementation from the README. <a class="readme-diagram-link" href="https://github.com/SotirUsama1/NU-ECEN430-AIoT_Task#serial-console-boot-log-flow" target="_blank" rel="noreferrer">Open original README diagram ↗</a></p></div>
+        <figure class="sequence-diagram">
+          <img src="./serial-sequence.svg" alt="Sequence diagram: the browser opens a WebSocket, the dashboard creates an ephemeral key and registers it with EC2 Instance Connect, connects to the regional serial endpoint, then relays Linux boot output back to the browser.">
+          <figcaption>Connection setup flows toward the instance; boot output then returns to the browser.</figcaption>
+        </figure>
+        <div class="sequence-bottom"><div class="key-window"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="18" cy="25" r="9"/><path d="m25 19 14-14m-5 5 4 4m-9 0 4 4"/></svg><div><strong>Separate from the guest's network</strong><p>The guest's IPv4 and inbound TCP/22 security-group rule are not used by this serial-console path.</p></div><span class="window-badge">~60 sec</span></div><a class="source-link" href="https://docs.aws.amazon.com/ec2-instance-connect/latest/APIReference/API_SendSerialConsoleSSHPublicKey.html" target="_blank" rel="noreferrer">AWS API reference: SendSerialConsoleSSHPublicKey <span aria-hidden="true">↗</span></a></div>
+      </article>
+
+      <article class="slide" id="slide-6" data-title="Dashboard experience" aria-hidden="true">
+        <div class="slide-head"><p class="eyebrow"><span class="eyebrow-mark">06</span> OPERATOR EXPERIENCE</p><h2>Turn low-level output into an <span class="accent-text">operational picture.</span></h2><p class="slide-intro">The dashboard keeps the serial stream raw while adding just enough context to answer: what is the instance doing now?</p></div>
+        <div class="dashboard-showcase">
+          <div class="mock-window">
+            <div class="mock-topbar"><div class="mock-brand"><span class="mock-logo">⌘</span><strong>EC2 Serial Console Dashboard</strong><span class="mock-live"><i></i> Live</span></div><div class="mock-chip"><i></i> Connected</div></div>
+            <div class="mock-layout"><aside class="mock-sidebar"><b>OVERVIEW</b><span class="mock-nav active">⌂ &nbsp; Overview</span><span class="mock-nav">▣ &nbsp; Serial Console</span><span class="mock-nav">▣ &nbsp; SSH Terminal</span><span class="mock-nav">⚙ &nbsp; Settings</span></aside>
+              <div class="mock-main"><div class="mock-instance-head"><div><h3>Ubuntu instance <span class="mock-running">Running</span></h3><small>EC2 Instance &nbsp; • &nbsp; eu-west-3 &nbsp; • &nbsp; Serial Port 0</small></div><div class="mock-actions"><span>Open SSH Terminal</span><b>↻ &nbsp; Reboot Instance</b></div></div>
+                <div class="mock-columns"><div class="mock-left"><section class="mock-card"><header><strong>▦ &nbsp; Serial Console Logs</strong><small><i></i> Live stream</small></header><div class="mock-terminal"><div>[ &nbsp;0.000000] Booting Linux on physical CPU 0x0</div><div>[ &nbsp;0.000000] Linux version 6.8.0-1021-aws</div><div>[ &nbsp;0.124820] printk: bootconsole [early0] enabled</div><div>[ &nbsp;1.804421] Loading initial ramdisk ...</div><div>[ &nbsp;4.183201] Mounting root filesystem ...</div><div>[ &nbsp;8.620114] Starting systemd ...</div><div>[ 12.440308] Reached target Network.</div><div>[ 18.008341] Ubuntu 24.04 LTS login:</div><div class="cursor-line"><span>_</span></div></div><div class="mock-log-foot"><span>◉ &nbsp; Auto-scroll <b></b></span><small>42 lines logged</small><button>Clear</button></div></section>
+                  <section class="mock-card mock-boot"><header><strong>♧ &nbsp; Boot Sequence</strong><small class="mock-watch">Stopwatch &nbsp; 00:18.40</small></header><div class="mock-steps"><div class="mock-step done"><i>✓</i><b>Bootloader</b><small>+00:00.00</small></div><div class="mock-step done"><i>✓</i><b>Kernel</b><small>+00:02.14</small></div><div class="mock-step done"><i>✓</i><b>Initramfs</b><small>+00:03.82</small></div><div class="mock-step done"><i>✓</i><b>sbin/init</b><small>+00:07.20</small></div><div class="mock-step done"><i>✓</i><b>Services</b><small>+00:14.43</small></div><div class="mock-step current"><i>✓</i><b>Login</b><small>Reached</small></div></div><div class="mock-progress"><i></i></div></section></div>
+                  <div class="mock-right"><section class="mock-card mock-info"><header><strong>▣ &nbsp; Instance Information</strong></header><div><span>Instance ID</span><b>i-07cd9a05a4fb8d592</b></div><div><span>Region</span><b>eu-west-3 (Paris)</b></div><div><span>Instance Type</span><b>t3.micro</b></div><div><span>Public IPv4</span><b>•••.•••.•••.•••</b></div></section><section class="mock-card mock-metrics"><header><strong>◉ &nbsp; Health Metrics</strong><span class="mock-running">Healthy</span></header><div class="mock-metric"><span class="metric-symbol cpu">▥</span><div><b>CPU Usage <small>12%</small></b><svg viewBox="0 0 170 28" aria-hidden="true"><path d="M2 23 22 18 38 20 56 12 73 15 90 8 108 14 126 9 145 12 168 4"/></svg></div></div><div class="mock-metric"><span class="metric-symbol mem">▤</span><div><b>Memory Usage <small>28%</small></b><svg viewBox="0 0 170 28" aria-hidden="true"><path d="M2 20 24 18 40 13 57 16 74 10 92 12 109 7 129 13 147 8 168 10"/></svg></div></div><div class="mock-metric"><span class="metric-symbol disk">▱</span><div><b>Disk Usage <small>18%</small></b><svg viewBox="0 0 170 28" aria-hidden="true"><path d="M2 21 22 18 40 19 59 16 76 14 94 15 112 12 130 13 149 10 168 9"/></svg></div></div></section><section class="mock-card mock-status"><header><strong>✓ &nbsp; System Status</strong></header><p><i>✓</i> Instance status <b>running</b></p><p><i>✓</i> System checks <b>passed</b></p><p><i>✓</i> Serial Console <b>available</b></p></section></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="showcase-labels"><span><b>1</b> Raw logs</span><span><b>2</b> Boot milestones + elapsed time</span><span><b>3</b> Metrics + health</span><span><b>4</b> Reboot + interactive SSH</span></div>
+        </div>
+      </article>
+
+      <article class="slide" id="slide-7" data-title="Browser SSH path" aria-hidden="true">
+        <div class="slide-head"><p class="eyebrow"><span class="eyebrow-mark">07</span> BROWSER SSH TERMINAL</p><h2>A second terminal path—with <span class="accent-text">different requirements.</span></h2><p class="slide-intro">The browser shell uses ordinary SSH to the instance. Keeping this flow separate makes the distinction clear: it is useful after the guest network is reachable. <a class="readme-diagram-link" href="https://github.com/SotirUsama1/NU-ECEN430-AIoT_Task#browser-ssh-terminal-flow" target="_blank" rel="noreferrer">Open original README diagram ↗</a></p></div>
+        <figure class="ssh-sequence-diagram">
+          <img src="./ssh-sequence.svg" alt="Sequence diagram: xterm requests an SSH shell, the Node dashboard starts an SSH PTY with the mounted private key, and connects directly to the EC2 public IP on TCP port 22. Shell output and terminal input return over WebSocket.">
+          <figcaption>Browser SSH is a direct network connection to the guest. It does not use the Serial Console endpoint.</figcaption>
+        </figure>
+        <div class="ssh-distinction">
+          <div><span class="distinction-icon direct-icon">↗</span><p><strong>Browser SSH</strong><br>Public IP + TCP 22 + guest network + mounted EC2 key</p></div>
+          <span class="versus">VS</span>
+          <div><span class="distinction-icon serial-icon">⌁</span><p><strong>Serial Console</strong><br>AWS console endpoint + temporary key + serial port 0</p></div>
+        </div>
+      </article>
+
+      <article class="slide" id="slide-8" data-title="Metrics and reboot" aria-hidden="true">
+        <div class="slide-head"><p class="eyebrow"><span class="eyebrow-mark">08</span> OBSERVABILITY</p><h2>Logs explain the boot. <span class="accent-text">Metrics add context.</span></h2><p class="slide-intro">The project combines serial text, boot milestones, instance status, and CloudWatch metric history in one view. <a class="readme-diagram-link" href="https://github.com/SotirUsama1/NU-ECEN430-AIoT_Task#monitoring-and-refresh-behavior" target="_blank" rel="noreferrer">Open original README diagram ↗</a></p></div>
+        <div class="observability-grid">
+          <div class="metric-panel">
+            <div class="metric-panel-head"><div><span class="panel-kicker">CLOUDWATCH SERIES</span><h3>Resource trends</h3></div><span class="history-pill">Last 30 minutes</span></div>
+            <div class="chart-card"><div class="chart-label"><span><i class="chart-dot cpu-dot"></i>CPU utilization</span><b>12%</b></div><svg viewBox="0 0 580 110" preserveAspectRatio="none" role="img" aria-label="Illustrative CPU chart"><path class="chart-gridline" d="M0 22H580M0 55H580M0 88H580"/><path class="chart-fill cpu-fill" d="M0 81 45 72 92 77 139 50 187 58 235 42 282 54 330 34 378 46 426 25 473 39 520 18 580 29V110H0Z"/><path class="chart-line cpu-line" d="M0 81 45 72 92 77 139 50 187 58 235 42 282 54 330 34 378 46 426 25 473 39 520 18 580 29"/></svg><div class="chart-axis"><span>-30m</span><span>-20m</span><span>-10m</span><span>now</span></div></div>
+            <div class="chart-card"><div class="chart-label"><span><i class="chart-dot memory-dot"></i>Memory used</span><b>28%</b></div><svg viewBox="0 0 580 110" preserveAspectRatio="none" role="img" aria-label="Illustrative memory chart"><path class="chart-gridline" d="M0 22H580M0 55H580M0 88H580"/><path class="chart-fill memory-fill" d="M0 82 45 78 92 72 139 74 187 61 235 66 282 55 330 58 378 45 426 50 473 39 520 43 580 32V110H0Z"/><path class="chart-line memory-line" d="M0 82 45 78 92 72 139 74 187 61 235 66 282 55 330 58 378 45 426 50 473 39 520 43 580 32"/></svg><div class="chart-axis"><span>-30m</span><span>-20m</span><span>-10m</span><span>now</span></div></div>
+            <div class="metric-footnote"><span>⏱</span> Dashboard polls every 30 seconds; CloudWatch datapoint cadence can be slower.</div>
+          </div>
+          <div class="lifecycle-panel">
+            <div class="lifecycle-heading"><span class="panel-kicker">REBOOT + BOOT</span><h3>Observe a new boot cycle</h3></div>
+            <div class="reboot-cycle"><div class="cycle-node reboot-node"><span>↻</span><b>Reboot<br>action</b></div><div class="cycle-connector dashed"></div><div class="cycle-node shutdown-node"><span>◌</span><b>Shutdown<br>phase</b><small>bar stays reset</small></div><div class="cycle-connector"></div><div class="cycle-node boot-node"><span>⌁</span><b>Fresh boot<br>output</b><small>timers begin</small></div></div>
+            <div class="milestone-row"><span class="milestone-chip done">✓ Bootloader</span><span class="milestone-chip done">✓ Kernel</span><span class="milestone-chip done">✓ Initramfs</span><span class="milestone-chip active">● Login prompt</span></div>
+            <div class="lifecycle-note"><div class="note-icon">⌖</div><p><strong>Serial output is the event source.</strong> The dashboard watches the stream for recognizable boot text and updates milestone states and elapsed times from observed output.</p></div>
+            <div class="collection-cadence"><div><strong>60s</strong><span>CloudWatch agent<br>memory + root disk</span></div><i></i><div><strong>30s</strong><span>Dashboard refresh<br>status + graphs</span></div><i></i><div><strong>5m*</strong><span>EC2 basic metrics<br>CPU + network</span></div></div>
+            <small class="cadence-note">*EC2 detailed monitoring can provide 1-minute metrics.</small>
+          </div>
+        </div>
+        <figure class="metric-pipeline metric-pipeline-wide"><img src="./metrics-pipeline.svg" alt="CloudWatch data flow: the EC2 CloudWatch agent publishes memory and disk data every 60 seconds; the dashboard queries CloudWatch every 30 seconds and sends chart data to the browser over WebSocket."><figcaption>Metrics path adapted from the README monitoring architecture.</figcaption></figure>
+      </article>
+
+      <article class="slide" id="slide-9" data-title="Reproducible deployment" aria-hidden="true">
+        <div class="slide-head"><p class="eyebrow"><span class="eyebrow-mark">09</span> PORTABLE BY DESIGN</p><h2>Recreate the environment without <span class="accent-text">baking in the instance.</span></h2><p class="slide-intro">Terraform outputs and runtime configuration let the same dashboard image point to a newly created instance.</p></div>
+        <div class="repro-flow" aria-label="Reproducible workflow from source and Terraform to a locally run Docker image">
+          <div class="repro-step"><div class="repro-icon source-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M18 11 8 24l10 13m12-26 10 13-10 13M28 8l-8 32"/></svg></div><span class="repro-step-no">STEP 01</span><strong>Clone the repo</strong><p>Start with the source and infrastructure definitions.</p><code>git clone …</code></div>
+          <div class="repro-arrow">→</div>
+          <div class="repro-step"><div class="repro-icon terraform-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="m24 6 17 9v18l-17 9-17-9V15l17-9Z"/><path d="m7 15 17 9 17-9M24 24v18m-8-31 17 9"/></svg></div><span class="repro-step-no">STEP 02</span><strong>Apply Terraform</strong><p>Provision VPC, instance, IAM, and serial access in your account.</p><code>terraform apply</code></div>
+          <div class="repro-arrow">→</div>
+          <div class="repro-step"><div class="repro-icon env-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 7h24a3 3 0 0 1 3 3v28a3 3 0 0 1-3 3H12a3 3 0 0 1-3-3V10a3 3 0 0 1 3-3Z"/><path d="M16 17h16m-16 7h16m-16 7h11"/><circle cx="34" cy="31" r="2"/></svg></div><span class="repro-step-no">STEP 03</span><strong>Export target config</strong><p>Instance ID, region, IP, and target flow into a local env file.</p><code>dashboard.env</code></div>
+          <div class="repro-arrow">→</div>
+          <div class="repro-step"><div class="repro-icon docker-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 20h34v15c0 5-4 8-9 8H17c-7 0-10-4-10-10V20Z"/><path d="M13 20v-7h7v7m3 0v-7h7v7m3 0v-7h7v7M5 27h38"/><path d="M34 13c1-4 5-6 9-5-1 4-4 6-9 5Z"/></svg></div><span class="repro-step-no">STEP 04</span><strong>Run the image</strong><p>Mount local credentials and SSH key; publish only on localhost.</p><code>docker run …</code></div>
+        </div>
+        <div class="repro-footer">
+          <div class="portable-callout"><span class="portable-icon">↻</span><div><strong>Destroy → reapply → regenerate `dashboard.env`</strong><p>The refreshed outputs let the dashboard follow the new instance ID and public IP.</p></div></div>
+          <div class="secret-boundary"><div class="secret-lock"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="21" width="30" height="22" rx="5"/><path d="M15 21v-7a9 9 0 0 1 18 0v7m-9 9v5"/></svg></div><div><strong>Secrets stay outside the image</strong><p>AWS profile + SSO cache and the EC2 key are mounted read-only. Terraform state stays in the local checkout.</p></div></div>
+        </div>
+        <div class="region-note"><span>Before applying in a new account:</span> confirm region, AMI, key pair, IAM permissions, serial access, and restrict SSH ingress to a trusted address.</div>
+      </article>
+
+      <article class="slide outcomes-slide" id="slide-10" data-title="What I learned" aria-hidden="true">
+        <div class="outcomes-heading"><div><p class="eyebrow"><span class="eyebrow-mark">10</span> PROJECT OUTCOMES</p><h2>What I learned <span class="accent-text">along the way.</span></h2><p class="slide-intro">The technical result matters. So does the way I learned to design, build, explain, and share it.</p></div><div class="outcome-seal"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="42" fill="#eaf3ff"/><path d="M29 53 43 67 72 35" fill="none" stroke="#1675e8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="42" fill="none" stroke="#b8d7fb" stroke-width="2"/></svg><span>BUILT<br>AND SHARED</span></div></div>
+        <div class="learning-grid">
+          <div class="learning-card learn-blue"><span class="learning-number">01</span><div class="learning-symbol"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="8" width="32" height="32" rx="7"/><path d="M14 17h20m-20 7h14m-14 7h18M24 4v4m0 32v4"/></svg></div><h3>AWS infrastructure, closer up</h3><p>I learned how AWS exposes an instance serial port through its managed EC2 Serial Console access path.</p></div>
+          <div class="learning-card learn-green"><span class="learning-number">02</span><div class="learning-symbol"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 14h32v25H8zM15 8h18v6M16 22h16m-16 7h11"/><path d="m31 31 4 4 7-9"/></svg></div><h3>Portable, reproducible work</h3><p>I felt the importance of making a project portable enough for someone else to recreate in a different environment.</p></div>
+          <div class="learning-card learn-violet"><span class="learning-number">03</span><div class="learning-symbol"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="9" width="34" height="27" rx="4"/><path d="m13 29 8-8 6 5 8-10M18 42h12m-6-6v6"/></svg></div><h3>Illustration is part of engineering</h3><p>I focused on making the presentation and diagrams illustrative, so the architecture is easier to understand.</p></div>
+          <div class="learning-card learn-amber"><span class="learning-number">04</span><div class="learning-symbol"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6 28 18l12-6-6 12 10 7-13 1-3 12-6-11-12 5 7-11-9-9 13 2 3-14Z"/><circle cx="24" cy="25" r="4"/></svg></div><h3>Guide an LLM with precision</h3><p>I learned to steer an LLM toward exactly what I need, efficiently. The whole project used less than half of a free ChatGPT plan's credits.</p></div>
+          <div class="learning-card learn-rose"><span class="learning-number">05</span><div class="learning-symbol"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="18" cy="16" r="6"/><circle cx="33" cy="18" r="5"/><path d="M7 39v-4a11 11 0 0 1 22 0v4Zm23-12a8 8 0 0 1 11 8v4h-9"/><path d="M5 11h6m-3-3v6"/></svg></div><h3>Present to a full class</h3><p>One of the rare times I had an individual project critiqued and presented to a full class—Dr., TA, and classmates.</p></div>
+          <div class="learning-card learn-cyan"><span class="learning-number">06</span><div class="learning-symbol"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="m24 5 4 12 13 1-10 8 3 13-10-7-11 7 4-13-10-8 13-1 4-12Z"/><circle cx="24" cy="24" r="5"/></svg></div><h3>Feel those roles again</h3><p>I got to feel like a Solution Architect, DevOps engineer, and AWS engineer again—connecting design, automation, operations, and the user experience.</p></div>
+        </div>
+      </article>
+
+      <article class="slide thank-you-slide" id="slide-11" data-title="Thank you" aria-hidden="true">
+        <div class="thank-you-copy">
+          <p class="eyebrow"><span class="eyebrow-mark">11</span> PROJECT PRESENTATION</p>
+          <h1>Thank <span class="accent-text">you.</span></h1>
+          <p class="thank-you-subtitle">EC2 Serial Console Dashboard</p>
+          <span class="thank-you-prompt">Questions &amp; discussion</span>
+        </div>
+        <div class="thank-you-contacts">
+          <a class="repo-qr-card" href="https://github.com/SotirUsama1/NU-ECEN430-AIoT_Task" target="_blank" rel="noreferrer" aria-label="Open the project GitHub repository">
+            <span class="contact-kicker">PROJECT REPOSITORY</span>
+            <img class="repo-qr" src="./repository-qr.svg" alt="QR code linking to the EC2 Serial Console Dashboard GitHub repository">
+            <strong>Scan to explore the project</strong>
+            <span class="repo-address">github.com/SotirUsama1/NU-ECEN430-AIoT_Task</span>
+          </a>
+          <a class="linkedin-contact" href="https://www.linkedin.com/in/sotir-latif" target="_blank" rel="noreferrer">
+            <svg class="linkedin-logo" viewBox="0 0 32 32" role="img" aria-label="LinkedIn"><path fill="currentColor" d="M29 0H3C1.35 0 0 1.35 0 3v26c0 1.65 1.35 3 3 3h26c1.65 0 3-1.35 3-3V3c0-1.65-1.35-3-3-3ZM9.5 26H5V12h4.5v14ZM7.25 10.1a2.6 2.6 0 1 1 0-5.2 2.6 2.6 0 0 1 0 5.2ZM27 26h-4.5v-6.8c0-1.62-.03-3.7-2.25-3.7-2.25 0-2.6 1.76-2.6 3.58V26h-4.5V12h4.32v1.91h.06c.6-1.1 2.07-2.25 4.26-2.25 4.56 0 5.41 3 5.41 6.9V26Z"/></svg>
+            <span><strong>LinkedIn</strong><span class="linkedin-address">www.linkedin.com/in/sotir-latif</span></span>
+            <span class="linkedin-open" aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </article>
+    </main>
+
+    <footer class="controls" aria-label="Presentation controls">
+      <div class="control-left"><button class="control-button" id="prev" type="button" aria-label="Previous slide"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button><button class="control-button" id="next" type="button" aria-label="Next slide"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button><span class="slide-count"><b id="current-slide">01</b><i>/</i><span id="total-slides">11</span></span></div>
+      <nav class="slide-dots" id="slide-dots" aria-label="Choose slide"></nav>
+      <div class="control-right"><span class="keyboard-hint"><kbd>←</kbd><kbd>→</kbd> navigate</span><button class="control-button overview-button" id="overview-open" type="button" aria-label="Open slide overview"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg></button><button class="control-button" id="fullscreen" type="button" aria-label="Enter fullscreen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4H4v4m12-4h4v4M4 16v4h4m12-4v4h-4"/></svg></button></div>
+      <div class="progress-track" aria-hidden="true"><span id="progress"></span></div>
+    </footer>
+  </div>
+
+  <dialog class="overview-dialog" id="overview" aria-labelledby="overview-title">
+    <div class="overview-header"><div><p class="eyebrow">PRESENTATION MAP</p><h2 id="overview-title">Choose a slide</h2></div><button class="control-button" id="overview-close" type="button" aria-label="Close overview">×</button></div>
+    <div class="overview-grid" id="overview-grid"></div>
+    <p class="overview-hint">Tip: use arrow keys to move between slides, <kbd>F</kbd> for fullscreen, and <kbd>O</kbd> for this overview.</p>
+  </dialog>
+</body>
+</html>

@@ -10,6 +10,8 @@ sotirusama/aiot-ec2-serial-console-dashboard:latest
 
 The image contains the Node.js application only. It does not contain AWS credentials, Terraform state, an EC2 private key, or the generated instance configuration. These are provided from each user's workstation at runtime.
 
+The repository also includes a standalone project presentation at [`public/presentation/`](public/presentation/). Open [`public/presentation/index.html`](public/presentation/index.html) directly, or serve it from a dashboard started from this checkout at [http://localhost:3001/presentation/](http://localhost:3001/presentation/). The HTML, CSS, JavaScript, and SVG illustrations are local; no presentation framework or external asset service is required. The Dockerfile includes the presentation in locally built images; a published image needs to be rebuilt and pushed to include this addition.
+
 ## Architecture review
 
 The project has two deployment layers. Terraform provisions the target and its AWS-side permissions. The dashboard is a separate Node.js application, distributed as a Docker image and run from a workstation. At runtime, the container connects to the instance through two independent paths: the AWS EC2 Serial Console for boot output and a normal SSH session for an interactive shell.

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 510" role="img" aria-labelledby="title desc">
+  <title id="title">EC2 serial console connection sequence</title>
+  <desc id="desc">The browser opens a dashboard WebSocket. The dashboard creates a temporary key, registers its public half with EC2 Instance Connect, then opens SSH to the regional serial console endpoint. Boot output flows from EC2 serial port zero back to the browser.</desc>
+  <defs>
+    <marker id="blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#1675e8"/></marker>
+    <marker id="green" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#0b9f66"/></marker>
+    <marker id="cyan" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#0891b2"/></marker>
+    <marker id="violet" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#805ad5"/></marker>
+    <marker id="gray" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#8493a7"/></marker>
+  </defs>
+  <rect x="12" y="12" width="1176" height="482" rx="18" fill="#fbfdff" stroke="#e3eaf3"/>
+  <g font-family="Inter,Arial,sans-serif" text-anchor="middle">
+    <rect x="59" y="31" width="132" height="51" rx="12" fill="#eaf3ff" stroke="#cfe2f8"/><text x="125" y="54" fill="#075dbd" font-size="15" font-weight="750">Browser</text><text x="125" y="71" fill="#5e7fa6" font-size="11">xterm + WebSocket</text>
+    <rect x="292" y="31" width="152" height="51" rx="12" fill="#f0ebff" stroke="#d8ccfa"/><text x="368" y="54" fill="#57369f" font-size="15" font-weight="750">Dashboard</text><text x="368" y="71" fill="#76629d" font-size="11">Node.js process</text>
+    <rect x="520" y="31" width="160" height="51" rx="12" fill="#e8f8f1" stroke="#ccebdc"/><text x="600" y="54" fill="#11734f" font-size="14" font-weight="750">EC2 Instance</text><text x="600" y="71" fill="#5b9178" font-size="11">Connect API</text>
+    <rect x="757" y="31" width="160" height="51" rx="12" fill="#e7f8fb" stroke="#c5edf2"/><text x="837" y="54" fill="#116276" font-size="14" font-weight="750">Serial endpoint</text><text x="837" y="71" fill="#5b8793" font-size="11">regional AWS service</text>
+    <rect x="1017" y="31" width="132" height="51" rx="12" fill="#fff4e2" stroke="#f0dfba"/><text x="1083" y="54" fill="#8c6115" font-size="14" font-weight="750">EC2 port 0</text><text x="1083" y="71" fill="#9b7b40" font-size="11">virtual serial port</text>
+  </g>
+  <g stroke="#cbd7e5" stroke-width="1.5" stroke-dasharray="4 7"><path d="M125 90v376M368 90v376M600 90v376M837 90v376M1083 90v376"/></g>
+  <g font-family="Inter,Arial,sans-serif" font-size="13" font-weight="650">
+    <path d="M125 125h243" fill="none" stroke="#1675e8" stroke-width="2.5" marker-end="url(#blue)"/><rect x="156" y="106" width="180" height="27" rx="13" fill="#fff" stroke="#dceafa"/><text x="246" y="124" text-anchor="middle" fill="#175da7">1 · Open dashboard socket</text>
+    <path d="M368 159v25h44v-25" fill="none" stroke="#805ad5" stroke-width="2.5" marker-end="url(#violet)"/><rect x="421" y="157" width="197" height="28" rx="13" fill="#fff" stroke="#e5dcfa"/><text x="519" y="176" text-anchor="middle" fill="#6244ab">2 · Generate temporary key pair</text>
+    <path d="M368 218h232" fill="none" stroke="#0b9f66" stroke-width="2.5" marker-end="url(#green)"/><rect x="393" y="199" width="183" height="28" rx="13" fill="#fff" stroke="#d4efdf"/><text x="484" y="218" text-anchor="middle" fill="#11734f">3 · Register public key</text>
+    <path d="M600 252h-232" fill="none" stroke="#0b9f66" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#green)"/><rect x="395" y="236" width="180" height="28" rx="13" fill="#fff" stroke="#d4efdf"/><text x="485" y="255" text-anchor="middle" fill="#11734f">4 · Success · valid 60 seconds</text>
+    <path d="M368 300h469" fill="none" stroke="#0891b2" stroke-width="2.5" marker-end="url(#cyan)"/><rect x="499" y="281" width="208" height="28" rx="13" fill="#fff" stroke="#ccecf1"/><text x="603" y="300" text-anchor="middle" fill="#116276">5 · SSH: instance-id.port0</text>
+    <path d="M837 334h246" fill="none" stroke="#8493a7" stroke-width="2.5" marker-end="url(#gray)"/><rect x="862" y="315" width="196" height="28" rx="13" fill="#fff" stroke="#e0e7ef"/><text x="960" y="334" text-anchor="middle" fill="#52647d">6 · Attach session to port 0</text>
+    <path d="M1083 378h-246" fill="none" stroke="#e39724" stroke-width="2.5" marker-end="url(#gray)"/><rect x="870" y="359" width="181" height="28" rx="13" fill="#fff" stroke="#f0dfba"/><text x="960" y="378" text-anchor="middle" fill="#8c6115">7 · Linux boot output</text>
+    <path d="M837 412H368" fill="none" stroke="#805ad5" stroke-width="2.5" marker-end="url(#violet)"/><rect x="523" y="393" width="160" height="28" rx="13" fill="#fff" stroke="#e5dcfa"/><text x="603" y="412" text-anchor="middle" fill="#6244ab">8 · SSH stdout stream</text>
+    <path d="M368 446H125" fill="none" stroke="#1675e8" stroke-width="2.5" marker-end="url(#blue)"/><rect x="171" y="427" width="151" height="28" rx="13" fill="#fff" stroke="#dceafa"/><text x="246" y="446" text-anchor="middle" fill="#175da7">9 · WebSocket data</text>
+  </g>
+  <text x="600" y="478" text-anchor="middle" fill="#75869b" font-family="Inter,Arial,sans-serif" font-size="12">Serial input travels back from the browser to the guest over the same interactive session.</text>
+</svg>
