@@ -29,7 +29,7 @@ if [[ ! -r "$ssh_known_hosts" ]]; then
 fi
 aws_config_dir="$(cd -- "$aws_config_dir" && pwd)"
 
-docker build -t ec2-serial-console-dashboard:local "$project_dir"
+docker build -t sotirusama/aiot-ec2-serial-console-dashboard:latest "$project_dir"
 
 terraform -chdir="$terraform_dir" apply "$@"
 terraform -chdir="$terraform_dir" output -raw dashboard_env | sed 's/\r$//' > "$temp_env_file"
@@ -67,4 +67,4 @@ exec docker run --rm \
   --mount "type=bind,src=$aws_config_dir,dst=/home/node/.aws,readonly" \
   --mount "type=bind,src=$ssh_known_hosts,dst=/home/node/.ssh/known_hosts,readonly" \
   --mount "type=bind,src=$browser_ssh_state,dst=/run/dashboard-ssh" \
-  ec2-serial-console-dashboard:local
+  sotirusama/aiot-ec2-serial-console-dashboard:latest
